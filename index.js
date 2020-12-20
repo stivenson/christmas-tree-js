@@ -1,9 +1,12 @@
 const { log } = console;
 
-const {randomColor} = require("./colors");
+const colorize = (color, output) => {
+    return ['\033[', color, 'm', output, '\033[0m'].join('');
+}
 
-log("Enter number of rows: ");
-const stdin = process.openStdin();
+const getRandomArbitrary = (min, max) => {
+    return Math.floor(Math.random() * (max - min)) + min; 
+}
 
 const generateTree = (rows, starts) => {
     if(starts <= rows) {
@@ -22,20 +25,25 @@ const generateTree = (rows, starts) => {
         let spacesText = ''
         for (let spaces = 0; spaces < spacesLine; spaces++)
             spacesText += '  '
-        log('\x1b[36m%s\x1b[0m', `${spacesText}${startsText}`)
-        generateTree(rows, starts+1) // recursive call to function
+        
+        return `${spacesText}${colorize(getRandomArbitrary(90,95), startsText)}\n`+generateTree(rows, starts+1) // recursive call to function
     } else {
         let spacesText = ''
         for (let spaces = 0; spaces < parseInt(rows+rows, 10)-2; spaces++)
             spacesText += ' '
-        log('\x1b[36m%s\x1b[0m', `${spacesText}|`)
-
-        return;
+        return `${spacesText}${colorize(94, "|")}\n`;
     }
 }
 
+
+log("Enter number of rows: ");
+const stdin = process.openStdin();
+
 stdin.addListener("data", d => {
-    generateTree(parseInt(d, 10), 1)
-    process.exit()
+    setInterval(() => {
+        process.stdout.write('\u001B[2J\u001B[0;0f');
+        process.stdout.cursorTo(0);
+        process.stdout.write(generateTree(parseInt(d, 10), 1))
+    },1500)
 });
 
